@@ -189,4 +189,31 @@ public class GenericDao<T> implements IGenericDao<T> {
 		}
 	}
 
+	@Override
+	public void insertPair(String sql, Object... params) {
+		Connection conn = null;
+		PreparedStatement statement = null;
+		try {
+			conn = getConnection();
+			conn.setAutoCommit(false);
+			statement = conn.prepareStatement(sql);
+			
+			setParameters(statement, params);
+			
+			statement.executeUpdate();
+			
+			conn.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			if (conn != null) {
+				try {
+					conn.rollback();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+	}
+		
+
 }

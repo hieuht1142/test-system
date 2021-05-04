@@ -16,6 +16,13 @@ public class QuestionDao extends GenericDao<QuestionModel> implements IQuestionD
 		return query(sql.toString(), new QuestionMapper(), "%" + subjectId + "%", 
 						"%" + subjectTitle + "%", "%" + topic + "%");
 	}
+	
+	@Override
+	public List<QuestionModel> findByExamId(Long examId) {
+		StringBuilder sql = new StringBuilder("SELECT * FROM question JOIN exam_question ");
+		sql.append("ON id = question_id WHERE exam_id = ?");
+		return query(sql.toString(), new QuestionMapper(), examId);
+	}
 
 	@Override
 	public Long save(QuestionModel question) {
@@ -44,6 +51,5 @@ public class QuestionDao extends GenericDao<QuestionModel> implements IQuestionD
 		update("DELETE FROM answer WHERE question_id = ?", questionId);
 		update("DELETE FROM question WHERE id = ?", questionId);
 	}
-
 
 }
