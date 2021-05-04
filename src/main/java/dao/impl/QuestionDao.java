@@ -11,7 +11,7 @@ public class QuestionDao extends GenericDao<QuestionModel> implements IQuestionD
 	@Override
 	public List<QuestionModel> find(String subjectId, String subjectTitle, String topic) {
 		StringBuilder sql = new StringBuilder("SELECT * FROM question WHERE ");
-		sql.append("subject_id LIKE ?, subject_title LIKE ?, topic LIKE ?");
+		sql.append("subject_id LIKE ? AND subject_title LIKE ? AND topic LIKE ?");
 		
 		return query(sql.toString(), new QuestionMapper(), "%" + subjectId + "%", 
 						"%" + subjectTitle + "%", "%" + topic + "%");
