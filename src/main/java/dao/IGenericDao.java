@@ -22,4 +22,6 @@ public interface IGenericDao<T> {
 	Long insert(String sql, Object... params);
 	
 	void insertPair(String sql, Object... params);
+	
+	public int count(String sql, Object... params);
 }

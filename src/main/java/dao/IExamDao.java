@@ -3,12 +3,13 @@ package dao;
 import java.util.List;
 
 import model.ExamModel;
+import model.QuestionModel;
 
 public interface IExamDao extends IGenericDao<ExamModel> {
 	
-	List<ExamModel> find(String subjectId, String subjectTitle, String semester);
+	List<ExamModel> find(Long subject, String semester);
 	
-	List<ExamModel> findById(Long examId);
+	ExamModel findById(Long examId);
 	
 	Long save(ExamModel exam);
 	
@@ -19,5 +20,7 @@ public interface IExamDao extends IGenericDao<ExamModel> {
 	void addQuestion(Long examId, Long questionId);
 	
 	void removeQuestion(Long examId, Long questionId);
+	
+	List<QuestionModel> findQuestion(Long examId);
 
 }

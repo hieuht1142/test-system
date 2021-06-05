@@ -1,57 +1,74 @@
 package service.impl;
 
+import java.sql.Timestamp;
 import java.util.List;
 
-import dao.IAnswerDao;
+import javax.inject.Inject;
+
 import dao.IQuestionDao;
-import model.AnswerModel;
 import model.QuestionModel;
+import paging.Pageble;
 import service.IQuestionService;
 
 public class QuestionService implements IQuestionService {
 	
+	@Inject
 	private IQuestionDao questionDao;
-	private IAnswerDao answerDao;
-
+	
 	@Override
-	public List<QuestionModel> find(String subjectId, String subjectTitle, String topic) {
-		List<QuestionModel> questions = questionDao.find(subjectId, subjectTitle, topic);
-		
-		for (int i = 0; i < questions.size(); i++) {
-			questions.get(i).setAnswerList(answerDao.findByQuestionId(questions.get(i).getId()));
-		}
-		
-		return questions;
+	public List<QuestionModel> find(Long subject, String topic) {				
+		return questionDao.find(subject, topic);
+	}
+	
+	@Override
+	public QuestionModel findById(Long id) {
+		return questionDao.findById(id);
 	}
 
 	@Override
 	public Long save(QuestionModel question) {
-		Long id = questionDao.save(question);
-		
-		List<AnswerModel> answers = question.getAnswerList();
-		for (int i = 0; i < answers.size(); i++) {
-			answerDao.save(answers.get(i));
-		}
-		
-		return id;
+		question.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+		question.setLastModified(new Timestamp(System.currentTimeMillis()));
+		question.setStatus(0);
+		return questionDao.save(question);
 	}
 
 	@Override
 	public void update(QuestionModel question) {
-		questionDao.update(question);
+		QuestionModel oldQuestion = questionDao.findById(question.getId());
 		
-		List<AnswerModel> answers = question.getAnswerList();
-		for (int i = 0; i < answers.size(); i++) {
-			answerDao.update(answers.get(i));
+		question.setCreator(oldQuestion.getCreator());
+		question.setCreatedDate(oldQuestion.getCreatedDate());
+		question.setLastModified(new Timestamp(System.currentTimeMillis()));
+		
+		questionDao.update(question);
+	}
+
+	@Override
+	public void delete(Long[] ids) {
+		for (Long id: ids) {
+			questionDao.delete(id);
 		}
 	}
 
 	@Override
-	public void delete(Long questionId) {
-		// todo: check if question can be deleted
-		
-		// delete questions
-		questionDao.delete(questionId);
+	public List<QuestionModel> findAll(Pageble pageble, Long examId, Long subject) {
+		return questionDao.findAll(pageble, examId, subject);
+	}
+
+	@Override
+	public int getTotalItems(Long examId, Long subject) {
+		return questionDao.getTotalItems(examId, subject);
+	}
+
+	@Override
+	public List<QuestionModel> findAll(Pageble pageble, Long subject, String topic) {
+		return questionDao.findAll(pageble, subject, topic);
+	}
+
+	@Override
+	public int getTotalItems(Long subject, String topic) {
+		return questionDao.getTotalItems(subject, topic);
 	}
 	
 }

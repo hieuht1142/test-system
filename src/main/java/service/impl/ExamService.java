@@ -1,8 +1,10 @@
 package service.impl;
 
+import java.sql.Timestamp;
 import java.util.List;
 
-import dao.IAnswerDao;
+import javax.inject.Inject;
+
 import dao.IExamDao;
 import dao.IQuestionDao;
 import model.ExamModel;
@@ -11,22 +13,21 @@ import service.IExamService;
 
 public class ExamService implements IExamService {
 	
+	@Inject
 	private IExamDao examDao;
+	
+	@Inject
 	private IQuestionDao questionDao;
-	private IAnswerDao answerDao;
 
 	@Override
-	public List<ExamModel> find(String subjectId, String subjectTitle, String semester) {
-		return examDao.find(subjectId, subjectTitle, semester);
+	public List<ExamModel> find(Long subject, String semester) {
+		return examDao.find(subject, semester);
 	}
 	
 	@Override
 	public ExamModel findById(Long examId) {
-		ExamModel exam = examDao.findById(examId).get(0);
+		ExamModel exam = examDao.findById(examId);
 		List<QuestionModel> questions = questionDao.findByExamId(examId);
-		for (int i = 0; i < questions.size(); i++) {
-			questions.get(i).setAnswerList(answerDao.findByQuestionId(questions.get(i).getId()));
-		}
 		exam.setQuestionList(questions);
 		
 		return exam;
@@ -34,29 +35,44 @@ public class ExamService implements IExamService {
 
 	@Override
 	public Long save(ExamModel exam) {
+		exam.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+		exam.setLastModified(new Timestamp(System.currentTimeMillis()));
+		exam.setStatus(0);
 		Long id = examDao.save(exam);
-		
-		if (id != null) {
-			List<QuestionModel> questions = exam.getQuestionList();
-			for (int i = 0; i < questions.size(); i++) {
-				examDao.addQuestion(id, questions.get(i).getId());
-			}
-		}
 		
 		return id;
 	}
 
 	@Override
 	public void update(ExamModel exam) {
+		ExamModel oldExam = examDao.findById(exam.getId());
 		
+		exam.setCreator(oldExam.getCreator());
+		exam.setCreatedDate(oldExam.getCreatedDate());
+		exam.setLastModified(new Timestamp(System.currentTimeMillis()));
 		
+		examDao.update(exam);
 	}
 
 	@Override
-	public void delete(Long examId) {
-		
-		
+	public void delete(Long[] ids) {
+		for (Long id: ids) {
+			examDao.delete(id);
+		}
 	}
 
-	
+	@Override
+	public List<QuestionModel> findQuestion(Long examId) {
+		return examDao.findQuestion(examId);
+	}
+
+	@Override
+	public void addQuestion(Long examId, Long questionId) {
+		examDao.addQuestion(examId, questionId);
+	}
+
+	@Override
+	public void removeQuestion(Long examId, Long questionId) {
+		examDao.removeQuestion(examId, questionId);	
+	}
 }

@@ -10,6 +10,7 @@ public class UserModel {
 	private String name;
 	private Date dateOfBirth;
 	private String email;
+	private String role;
 	
 	public Long getId() {
 		return id;
@@ -46,6 +47,12 @@ public class UserModel {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 }

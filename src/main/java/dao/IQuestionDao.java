@@ -3,10 +3,13 @@ package dao;
 import java.util.List;
 
 import model.QuestionModel;
+import paging.Pageble;
 
 public interface IQuestionDao extends IGenericDao<QuestionModel> {
 	
-	List<QuestionModel> find(String subjectId, String subjectTitle, String topic);
+	List<QuestionModel> find(Long subject, String topic);
+	
+	QuestionModel findById(Long id);
 	
 	List<QuestionModel> findByExamId(Long examId);
 	
@@ -15,5 +18,13 @@ public interface IQuestionDao extends IGenericDao<QuestionModel> {
 	void update(QuestionModel question);
 	
 	void delete(Long questionId);
+	
+	List<QuestionModel> findAll(Pageble pageble, Long examId, Long subject);
+	
+	int getTotalItems(Long examId, Long subject);
+	
+	List<QuestionModel> findAll(Pageble pageble, Long subject, String topic);
+	
+	int getTotalItems(Long subject, String topic);
 
 }

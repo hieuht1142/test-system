@@ -3,10 +3,11 @@ package service;
 import java.util.List;
 
 import model.ExamModel;
+import model.QuestionModel;
 
 public interface IExamService {
 	
-	List<ExamModel> find(String subjectId, String subjectTitle, String semester);
+	List<ExamModel> find(Long subject, String semester);
 	
 	ExamModel findById(Long examId);
 	
@@ -14,5 +15,11 @@ public interface IExamService {
 	
 	void update(ExamModel exam);
 	
-	void delete(Long examId);
+	void delete(Long[] ids);
+	
+	List<QuestionModel> findQuestion(Long examId);
+	
+	void addQuestion(Long examId, Long questionId);
+	
+	void removeQuestion(Long examId, Long questionId);
 }

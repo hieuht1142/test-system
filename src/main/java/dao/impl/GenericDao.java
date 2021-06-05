@@ -1,6 +1,7 @@
 package dao.impl;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,19 +10,29 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import dao.IGenericDao;
 import mapper.IRowMapper;
 
 public class GenericDao<T> implements IGenericDao<T> {
 	
+	ResourceBundle resourceBundle = ResourceBundle.getBundle("db");
+	
 	public Connection getConnection() {
 		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-			String url = "jdbc:mysql://localhost:3306/test?useSSL=false";
-			String user = "root";
-			String password = "000000";
+//			Class.forName("com.mysql.cj.jdbc.Driver");
+//			String url = "jdbc:mysql://localhost:3306/test?useSSL=false";
+//			String user = "root";
+//			String password = "000000";
+//			return DriverManager.getConnection(url, user, password);
+			
+			Class.forName(resourceBundle.getString("driverName"));
+			String url = resourceBundle.getString("url");
+			String user = resourceBundle.getString("user");
+			String password = resourceBundle.getString("password");
 			return DriverManager.getConnection(url, user, password);
+			
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 			return null;
@@ -47,6 +58,8 @@ public class GenericDao<T> implements IGenericDao<T> {
 					statement.setInt(i+1, (Integer) param);
 				} else if (param instanceof Timestamp) {
 					statement.setTimestamp(i+1, (Timestamp) param);
+				} else if (param instanceof Date) {
+					statement.setDate(i+1, (Date) param);
 				}
 			}
 		} catch (SQLException e) {
@@ -211,6 +224,49 @@ public class GenericDao<T> implements IGenericDao<T> {
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
+			}
+		}
+	}
+
+	@Override
+	public int count(String sql, Object... params) {
+		Connection conn = null;
+		PreparedStatement statement = null;
+		ResultSet rs = null;
+		int cnt = 0;
+		
+		try {
+			conn = getConnection();
+			statement = conn.prepareStatement(sql);
+			
+			setParameters(statement, params);
+			
+			rs = statement.executeQuery();
+			
+			while (rs.next()) {
+				cnt = rs.getInt(1);
+			}
+			
+			return cnt;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		} finally {
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+				
+				if (statement != null) {
+					statement.close();
+				}
+				
+				if (rs != null) {
+					rs.close();
+				}
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+				return 0;
 			}
 		}
 	}
